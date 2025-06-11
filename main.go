@@ -24,25 +24,20 @@ func main() {
 
 `
 	yaml := `
-selector: ".product" 
+selector: ".product"
 fields:
   title:
-    selector: ".title"
-    transform: ["trim", "upper"]
-  price:
-    selector: ".price"
-    transform: ["number"]
-  date:
-    selector: ".date"
-    transform: ["trim", "date"]
+    selector: "h2"
+    transform: trim
+
   image:
     selector: "img"
-    attr: "src"
-    transform: ["trim"]
-  link:
-    selector: "a"
-    attr: "href"
-    transform: ["trim"]
+    transform: ["attr(src)"]
+
+  raw_html:
+    selector: ""
+    transform: trim
+
 
 `
 

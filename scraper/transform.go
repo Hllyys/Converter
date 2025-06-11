@@ -5,46 +5,65 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
-func ApplyTransform(value string, transforms []string) string {
-	for _, transform := range transforms {
-		switch transform {
+func ApplyTransform(value string, selection *goquery.Selection, transform interface{}) string {
+	var transforms []string
 
-		case "trim":
+	switch t := transform.(type) {
+	case string:
+		transforms = []string{t}
+	case []interface{}:
+		for _, v := range t {
+			if s, ok := v.(string); ok {
+				transforms = append(transforms, s)
+			}
+		}
+	case []string:
+		transforms = t
+	default:
+		return value
+	}
+
+	for _, t := range transforms {
+		switch {
+		case t == "trim":
 			value = strings.TrimSpace(value)
 
-		case "upper":
+		case t == "upper":
 			value = strings.ToUpper(value)
 
-		case "lower":
+		case t == "lower":
 			value = strings.ToLower(value)
 
-		// "number": İlk rakam grubunu çıkar
-		// Örn: "$1,234" → "1234"
-		case "number":
-			re := regexp.MustCompile(`\d+`) // Rakamları eşle
+		case t == "number":
+			re := regexp.MustCompile(`\d+`)
 			match := re.FindString(value)
-			if match != "" {
-				value = match
-			} else {
-				value = ""
-			}
+			value = match
 
-		// "date": Tarihi "2006-01-02" formatından "02 Jan 2006" formatına çevirir
-		case "date":
+		case t == "date":
 			parsed, err := time.Parse("2006-01-02", strings.TrimSpace(value))
 			if err == nil {
 				value = parsed.Format("02 Jan 2006")
 			}
 
-		// "timestamp": Tarihi "2006-01-02" formatından Unix timestamp'e çevirir
-		case "timestamp":
+		case t == "timestamp":
 			parsed, err := time.Parse("2006-01-02", strings.TrimSpace(value))
 			if err == nil {
 				value = strconv.FormatInt(parsed.Unix(), 10)
 			}
+
+		case strings.HasPrefix(t, "attr("):
+			attr := strings.TrimSuffix(strings.TrimPrefix(t, "attr("), ")")
+			if val, exists := selection.Attr(attr); exists {
+				value = val
+			} else {
+				value = ""
+			}
 		}
 	}
+
 	return value
 }
