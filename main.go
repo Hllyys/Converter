@@ -8,36 +8,40 @@ import (
 func main() {
 	html := `
 <div class="product">
-  <h2 class="title">Hello World</h2>
-  <span class="price">₺1</span>
+  <h2 class="title">hello world</h2>
+  <span class="price">$1</span>
   <span class="date">2025-05-01</span>
-  <img src="image.jpg">
-  <a href="https://example.com">Details</a>
+  <a class="link" href="https://example.com">Link</a>
+  <img class="image" src="image.jpg" />
 </div>
 <div class="product">
-  <h2 class="title">Another Item</h2>
-  <span class="price">₺2</span>
-  <span class="date">2025-05-02</span>
-  <img src="another.jpg">
-  <a href="https://example.com/2">Details</a>
+  <h2 class="title">another title</h2>
+  <span class="price">$99</span>
+  <span class="date">2025-06-01</span>
+  <a class="link" href="https://example.com/item">Link</a>
+  <img class="image" src="another.jpg" />
 </div>
+
 
 `
 	yaml := `
 selector: ".product"
 fields:
   title:
-    selector: "h2"
-    transform: trim
-
+    selector: ".title"
+    transform: [upper, trim]
+  price:
+    selector: ".price"
+    transform: [number]
+  date:
+    selector: ".date"
+    transform: [date]
+  link:
+    selector: ".link"
+    transform: ["attr(href)"]
   image:
-    selector: "img"
+    selector: ".image"
     transform: ["attr(src)"]
-
-  raw_html:
-    selector: ""
-    transform: trim
-
 
 `
 
