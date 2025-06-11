@@ -16,9 +16,11 @@ func ApplyTransform(value string, selection *goquery.Selection, transform interf
 	case string:
 		transforms = []string{t}
 	case []interface{}:
-		for _, v := range t {
-			if s, ok := v.(string); ok {
-				transforms = append(transforms, s)
+		transforms = []string{}
+		for i := 0; i < len(t); i++ {
+			str, ok := t[i].(string)
+			if ok {
+				transforms = append(transforms, str)
 			}
 		}
 	case []string:
